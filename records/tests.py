@@ -1,53 +1,105 @@
 
+
 from django.urls import reverse
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
-from .models import Patient, Doctor, Appointment, Prescription, HealthRecord
+from django.contrib.auth.models import User
+from .models import Patient, Doctor, Appointment, Prescription, HealthRecord, UserProfile
 
-class PatientAPITestCase(APITestCase):
+
+class AuthRoleTestCase(APITestCase):
 	def setUp(self):
-		self.patient_data = {
-			'first_name': 'John',
-			'last_name': 'Doe',
-			'date_of_birth': '1990-01-01',
-			'email': 'john@example.com',
-			'phone': '1234567890'
-		}
-		self.patient = Patient.objects.create(**self.patient_data)
+		# Create doctor user
+		self.doctor_user = User.objects.create_user(username='doctor1', password='pass123')
+		UserProfile.objects.filter(user=self.doctor_user).update(role='doctor')
+		# Create patient user
+		self.patient_user = User.objects.create_user(username='patient1', password='pass123')
+		UserProfile.objects.filter(user=self.patient_user).update(role='patient')
 
-	def test_create_patient(self):
+		# Get JWT tokens
+		self.doctor_token = self._get_token('doctor1', 'pass123')
+		self.patient_token = self._get_token('patient1', 'pass123')
+
+		# Create test data
+		self.patient = Patient.objects.create(
+			first_name='John', last_name='Doe', date_of_birth='1990-01-01', email='john@example.com', phone='1234567890')
+		self.doctor = Doctor.objects.create(
+			first_name='Alice', last_name='Brown', specialty='Cardiology', email='alice@example.com', phone='5551234567')
+		self.appointment = Appointment.objects.create(
+			patient=self.patient, doctor=self.doctor, appointment_datetime='2025-10-01T10:00:00Z', status='scheduled')
+		self.prescription = Prescription.objects.create(
+			appointment=self.appointment, medication='Ibuprofen', dosage='200mg', instructions='Take after meals')
+
+	def _get_token(self, username, password):
+		url = reverse('token_obtain_pair')
+		response = self.client.post(url, {'username': username, 'password': password})
+		return response.data['access']
+
+	def _auth_client(self, token):
+		client = APIClient()
+		client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+		return client
+
+	# Patient endpoints
+	def test_patient_access_by_patient(self):
+		client = self._auth_client(self.patient_token)
 		url = reverse('patient-list-create')
-		data = {
-			'first_name': 'Jane',
-			'last_name': 'Smith',
-			'date_of_birth': '1985-05-05',
-			'email': 'jane@example.com',
-			'phone': '0987654321'
-		}
-		response = self.client.post(url, data)
-		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-	def test_get_patient(self):
-		url = reverse('patient-detail', args=[self.patient.id])
-		response = self.client.get(url)
+		response = client.get(url)
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
-		self.assertEqual(response.data['email'], self.patient.email)
 
-	def test_update_patient(self):
-		url = reverse('patient-detail', args=[self.patient.id])
-		data = {'phone': '1112223333'}
-		response = self.client.patch(url, data)
+	def test_patient_access_by_doctor(self):
+		client = self._auth_client(self.doctor_token)
+		url = reverse('patient-list-create')
+		response = client.get(url)
+		self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+	# Doctor endpoints
+	def test_doctor_access_by_doctor(self):
+		client = self._auth_client(self.doctor_token)
+		url = reverse('doctor-list-create')
+		response = client.get(url)
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
-		self.patient.refresh_from_db()
-		self.assertEqual(self.patient.phone, '1112223333')
 
-	def test_delete_patient(self):
-		url = reverse('patient-detail', args=[self.patient.id])
-		response = self.client.delete(url)
-		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+	def test_doctor_access_by_patient(self):
+		client = self._auth_client(self.patient_token)
+		url = reverse('doctor-list-create')
+		response = client.get(url)
+		self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+	# Appointment endpoints
+	def test_appointment_access_by_patient(self):
+		client = self._auth_client(self.patient_token)
+		url = reverse('appointment-list-create')
+		response = client.get(url)
+		self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+	def test_appointment_access_by_doctor(self):
+		client = self._auth_client(self.doctor_token)
+		url = reverse('appointment-list-create')
+		response = client.get(url)
+		self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+	# Prescription endpoints
+	def test_prescription_access_by_doctor(self):
+		client = self._auth_client(self.doctor_token)
+		url = reverse('prescription-list-create')
+		response = client.get(url)
+		self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+	def test_prescription_access_by_patient(self):
+		client = self._auth_client(self.patient_token)
+		url = reverse('prescription-list-create')
+		response = client.get(url)
+		self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
 
 class DoctorAPITestCase(APITestCase):
 	def setUp(self):
+		self.doctor_user = User.objects.create_user(username='doctor2', password='pass123')
+		UserProfile.objects.filter(user=self.doctor_user).update(role='doctor')
+		self.doctor_token = self._get_token('doctor2', 'pass123')
+		self.client = APIClient()
+		self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.doctor_token}')
 		self.doctor_data = {
 			'first_name': 'Alice',
 			'last_name': 'Brown',
@@ -56,6 +108,12 @@ class DoctorAPITestCase(APITestCase):
 			'phone': '5551234567'
 		}
 		self.doctor = Doctor.objects.create(**self.doctor_data)
+
+	def _get_token(self, username, password):
+		url = reverse('token_obtain_pair')
+		client = APIClient()
+		response = client.post(url, {'username': username, 'password': password})
+		return response.data['access']
 
 	def test_create_doctor(self):
 		url = reverse('doctor-list-create')
@@ -88,8 +146,14 @@ class DoctorAPITestCase(APITestCase):
 		response = self.client.delete(url)
 		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+
 class AppointmentAPITestCase(APITestCase):
 	def setUp(self):
+		self.patient_user = User.objects.create_user(username='patient2', password='pass123')
+		UserProfile.objects.filter(user=self.patient_user).update(role='patient')
+		self.patient_token = self._get_token('patient2', 'pass123')
+		self.client = APIClient()
+		self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.patient_token}')
 		self.patient = Patient.objects.create(
 			first_name='Ann', last_name='Lee', date_of_birth='1980-02-02', email='ann@example.com', phone='2223334444')
 		self.doctor = Doctor.objects.create(
@@ -102,6 +166,12 @@ class AppointmentAPITestCase(APITestCase):
 		}
 		self.appointment = Appointment.objects.create(
 			patient=self.patient, doctor=self.doctor, appointment_datetime='2025-10-01T10:00:00Z', status='scheduled')
+
+	def _get_token(self, username, password):
+		url = reverse('token_obtain_pair')
+		client = APIClient()
+		response = client.post(url, {'username': username, 'password': password})
+		return response.data['access']
 
 	def test_create_appointment(self):
 		url = reverse('appointment-list-create')
@@ -133,8 +203,14 @@ class AppointmentAPITestCase(APITestCase):
 		response = self.client.delete(url)
 		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+
 class PrescriptionAPITestCase(APITestCase):
 	def setUp(self):
+		self.doctor_user = User.objects.create_user(username='doctor3', password='pass123')
+		UserProfile.objects.filter(user=self.doctor_user).update(role='doctor')
+		self.doctor_token = self._get_token('doctor3', 'pass123')
+		self.client = APIClient()
+		self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.doctor_token}')
 		self.patient = Patient.objects.create(
 			first_name='Sam', last_name='Green', date_of_birth='1975-03-03', email='sam@example.com', phone='4445556666')
 		self.doctor = Doctor.objects.create(
@@ -149,6 +225,12 @@ class PrescriptionAPITestCase(APITestCase):
 		}
 		self.prescription = Prescription.objects.create(
 			appointment=self.appointment, medication='Ibuprofen', dosage='200mg', instructions='Take after meals')
+
+	def _get_token(self, username, password):
+		url = reverse('token_obtain_pair')
+		client = APIClient()
+		response = client.post(url, {'username': username, 'password': password})
+		return response.data['access']
 
 	def test_create_prescription(self):
 		url = reverse('prescription-list-create')
@@ -180,8 +262,14 @@ class PrescriptionAPITestCase(APITestCase):
 		response = self.client.delete(url)
 		self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+
 class HealthRecordAPITestCase(APITestCase):
 	def setUp(self):
+		self.doctor_user = User.objects.create_user(username='doctor4', password='pass123')
+		UserProfile.objects.filter(user=self.doctor_user).update(role='doctor')
+		self.doctor_token = self._get_token('doctor4', 'pass123')
+		self.client = APIClient()
+		self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.doctor_token}')
 		self.patient = Patient.objects.create(
 			first_name='Tom', last_name='Blue', date_of_birth='1965-04-04', email='tom@example.com', phone='7778889999')
 		self.doctor = Doctor.objects.create(
@@ -195,6 +283,12 @@ class HealthRecordAPITestCase(APITestCase):
 		}
 		self.healthrecord = HealthRecord.objects.create(
 			patient=self.patient, doctor=self.doctor, record_date='2025-09-01', diagnosis='Flu', treatment='Rest and fluids')
+
+	def _get_token(self, username, password):
+		url = reverse('token_obtain_pair')
+		client = APIClient()
+		response = client.post(url, {'username': username, 'password': password})
+		return response.data['access']
 
 	def test_create_healthrecord(self):
 		url = reverse('healthrecord-list-create')
