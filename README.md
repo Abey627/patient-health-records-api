@@ -87,12 +87,22 @@ pip install -r requirements.txt
 
 *(Optional but recommended: `python -m pip install --upgrade pip` before this step).*
 
+
 ### 3️⃣ Run Development Server
 ```bash
 python manage.py runserver
 ```
 
 Access at: [http://localhost:8000/](http://localhost:8000/)
+
+### 4️⃣ Create a Django Superuser
+To access the Django admin interface, create a superuser account:
+```bash
+python manage.py createsuperuser
+```
+Follow the prompts to set username, email, and password.
+
+Login at: [http://localhost:8000/admin/](http://localhost:8000/admin/)
 
 ---
 

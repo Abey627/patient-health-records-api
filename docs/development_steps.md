@@ -6,7 +6,7 @@ This document outlines the recommended steps for developing the Patient Health R
 ## Development Checklist
 
 - [x] Define data models in `records/models.py` (e.g., Patient, HealthRecord)
-- [ ] Register models in `records/admin.py` for admin management
+- [x] Register models in `records/admin.py` for admin management
 - [ ] Implement serializers and API views in `records/views.py` using Django REST Framework
 - [ ] Add URL patterns for API endpoints in `records/urls.py` and include in `phrapi/urls.py`
 - [ ] Write unit tests in `records/tests.py` for models and API endpoints
