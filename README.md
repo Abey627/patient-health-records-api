@@ -16,6 +16,7 @@ This project demonstrates backend engineering best practices for building secure
   - **Doctor** – specialization, license number, contact info.
   - **Appointment** – links doctor ↔ patient, datetime, status.
   - **Prescription** – medication, dosage, linked to appointment.
+  - **HealthRecord** – clinical notes, diagnosis, and treatment details for a patient, authored by a doctor.
 
 - **API Endpoints**
   - CRUD for Patients, Doctors, Appointments, Prescriptions.
