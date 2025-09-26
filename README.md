@@ -50,37 +50,40 @@ This project demonstrates backend engineering best practices for building secure
 ## 📂 Project Structure
 
 ```
-PHRAPI/
-├── phrapi/               # Django project
+patient-health-records-api/
+├── phrapi/                   # Django project settings and root URLs
 │   ├── __init__.py
 │   ├── asgi.py
-│   ├── settings.py
-│   ├── urls.py
+│   ├── settings.py           # Main settings (JWT, DRF, DB, etc.)
+│   ├── urls.py               # Root URL config (includes records.urls, JWT, docs)
 │   └── wsgi.py
 │
-├── records/              # Main app
-│   ├── migrations/
+├── records/                  # Main app: business logic and API
+│   ├── migrations/           # DB migrations
 │   ├── __init__.py
-│   ├── admin.py
+│   ├── admin.py              # Admin registration
 │   ├── apps.py
-│   ├── models.py
-│   ├── serializers.py
-│   ├── tests.py
-│   ├── views.py
-│   ├── urls.py
+│   ├── models.py             # Core models: Patient, Doctor, Appointment, etc.
+│   ├── permissions.py        # Custom role-based permissions
+│   ├── serializers.py        # DRF serializers for all entities
+│   ├── signals.py            # UserProfile auto-creation
+│   ├── tests.py              # Pytest/DRF test cases
+│   ├── urls.py               # App-level API endpoints
+│   ├── views.py              # DRF generic views, permission mixins
 │
-├── docs/                 # Project documentation
+├── docs/                     # Project documentation
 │   ├── api_design.md
 │   ├── development_steps.md
 │   ├── model_design.md
 │   ├── testing_design.md
 │   ├── url_patterns.md
+│   ├── auth_permissions.md
 │
-├── pytest.ini            # Pytest configuration
-├── requirements.txt      # Python dependencies
-├── manage.py             # Django management script
-├── README.md             # Project overview
-└── db.sqlite3            # SQLite database (for development)
+├── pytest.ini                # Pytest config
+├── requirements.txt          # Python dependencies
+├── manage.py                 # Django management script
+├── README.md                 # Project overview
+└── db.sqlite3                # SQLite DB (dev only)
 ```
 
 ---
