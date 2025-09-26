@@ -1,5 +1,7 @@
+
 from rest_framework import serializers
-from .models import Patient, Doctor, HealthRecord
+from .models import Patient, Doctor, Appointment, Prescription, HealthRecord
+
 
 class PatientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,6 +12,24 @@ class DoctorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
         fields = '__all__'
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    patient = PatientSerializer(read_only=True)
+    doctor = DoctorSerializer(read_only=True)
+    patient_id = serializers.PrimaryKeyRelatedField(queryset=Patient.objects.all(), source='patient', write_only=True)
+    doctor_id = serializers.PrimaryKeyRelatedField(queryset=Doctor.objects.all(), source='doctor', write_only=True)
+
+    class Meta:
+        model = Appointment
+        fields = ['id', 'patient', 'doctor', 'patient_id', 'doctor_id', 'appointment_datetime', 'status']
+
+class PrescriptionSerializer(serializers.ModelSerializer):
+    appointment = AppointmentSerializer(read_only=True)
+    appointment_id = serializers.PrimaryKeyRelatedField(queryset=Appointment.objects.all(), source='appointment', write_only=True)
+
+    class Meta:
+        model = Prescription
+        fields = ['id', 'appointment', 'appointment_id', 'medication', 'dosage', 'instructions']
 
 class HealthRecordSerializer(serializers.ModelSerializer):
     patient = PatientSerializer(read_only=True)

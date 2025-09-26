@@ -21,6 +21,23 @@ All API endpoints are prefixed with `/api/` for clarity and separation from othe
 - `PATCH /api/doctors/<id>/` — Partially update a doctor
 - `DELETE /api/doctors/<id>/` — Delete a doctor
 
+
+### Appointments
+- `GET /api/appointments/` — List all appointments
+- `POST /api/appointments/` — Create a new appointment
+- `GET /api/appointments/<id>/` — Retrieve an appointment by ID
+- `PUT /api/appointments/<id>/` — Update an appointment by ID
+- `PATCH /api/appointments/<id>/` — Partially update an appointment
+- `DELETE /api/appointments/<id>/` — Delete an appointment
+
+### Prescriptions
+- `GET /api/prescriptions/` — List all prescriptions
+- `POST /api/prescriptions/` — Create a new prescription
+- `GET /api/prescriptions/<id>/` — Retrieve a prescription by ID
+- `PUT /api/prescriptions/<id>/` — Update a prescription by ID
+- `PATCH /api/prescriptions/<id>/` — Partially update a prescription
+- `DELETE /api/prescriptions/<id>/` — Delete a prescription
+
 ### Health Records
 - `GET /api/health-records/` — List all health records
 - `POST /api/health-records/` — Create a new health record

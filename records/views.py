@@ -2,8 +2,9 @@
 # Create your views here.
 
 from rest_framework import generics
-from .models import Patient, Doctor, HealthRecord
-from .serializers import PatientSerializer, DoctorSerializer, HealthRecordSerializer
+from .models import Patient, Doctor, Appointment, Prescription, HealthRecord
+from .serializers import PatientSerializer, DoctorSerializer, AppointmentSerializer, PrescriptionSerializer, HealthRecordSerializer
+
 
 # Patient API Views
 class PatientListCreateView(generics.ListCreateAPIView):
@@ -22,6 +23,24 @@ class DoctorListCreateView(generics.ListCreateAPIView):
 class DoctorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 	queryset = Doctor.objects.all()
 	serializer_class = DoctorSerializer
+
+# Appointment API Views
+class AppointmentListCreateView(generics.ListCreateAPIView):
+	queryset = Appointment.objects.all()
+	serializer_class = AppointmentSerializer
+
+class AppointmentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+	queryset = Appointment.objects.all()
+	serializer_class = AppointmentSerializer
+
+# Prescription API Views
+class PrescriptionListCreateView(generics.ListCreateAPIView):
+	queryset = Prescription.objects.all()
+	serializer_class = PrescriptionSerializer
+
+class PrescriptionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+	queryset = Prescription.objects.all()
+	serializer_class = PrescriptionSerializer
 
 # HealthRecord API Views
 class HealthRecordListCreateView(generics.ListCreateAPIView):
