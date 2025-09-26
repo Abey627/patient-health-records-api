@@ -46,6 +46,7 @@ This project demonstrates backend engineering best practices for building secure
 
 ---
 
+
 ## 📂 Project Structure
 
 ```
@@ -63,18 +64,29 @@ PHRAPI/
 │   ├── admin.py
 │   ├── apps.py
 │   ├── models.py
+│   ├── serializers.py
 │   ├── tests.py
 │   ├── views.py
-│   └── urls.py (to be created)
+│   ├── urls.py
 │
-├── manage.py
-└── README.md
+├── docs/                 # Project documentation
+│   ├── api_design.md
+│   ├── development_steps.md
+│   ├── model_design.md
+│   ├── testing_design.md
+│   ├── url_patterns.md
+│
+├── pytest.ini            # Pytest configuration
+├── requirements.txt      # Python dependencies
+├── manage.py             # Django management script
+├── README.md             # Project overview
+└── db.sqlite3            # SQLite database (for development)
 ```
 
 ---
 
-## 🚀 Getting Started
 
+## 🚀 Getting Started
 
 ### 1️⃣ Clone the Repo
 ```bash
@@ -82,20 +94,29 @@ git clone https://github.com/Abey627/patient-health-records-api.git
 cd patient-health-records-api
 ```
 
-### 2️⃣ Install Dependencies
+### 2️⃣ Set Up Python Virtual Environment
+It is recommended to use a virtual environment to isolate project dependencies:
+```bash
+python -m venv venv-phrapi
+source venv-phrapi/Scripts/activate  # On Windows
+# Or
+source venv-phrapi/bin/activate      # On macOS/Linux
+```
+
+### 3️⃣ Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 *(Optional but recommended: `python -m pip install --upgrade pip` before this step).*
 
-### 3️⃣ Create a Django Superuser
+### 4️⃣ Create a Django Superuser
 To access the Django admin interface, create a superuser account:
 ```bash
 python manage.py createsuperuser
 ```
 Follow the prompts to set username, email, and password.
 
-### 4️⃣ Run Development Server
+### 5️⃣ Run Development Server
 ```bash
 python manage.py runserver
 ```
@@ -104,7 +125,7 @@ Access at: [http://localhost:8000/](http://localhost:8000/)
 
 Login to admin at: [http://localhost:8000/admin/](http://localhost:8000/admin/)
 
-### 5️⃣ API Documentation (Swagger UI)
+### 6️⃣ API Documentation (Swagger UI)
 Interactive API docs are available via drf-spectacular:
 ```bash
 http://localhost:8000/api/docs/
@@ -118,30 +139,5 @@ This provides a live, auto-generated OpenAPI/Swagger interface for all endpoints
 ```bash
 pytest
 ```
-
----
-
-## 📌 Roadmap
-
-### Phase 1: Core EMR
-- [x] Django + DRF setup
-- [x] Project scaffold with `phrapi` + `records` app
-- [ ] Models (Patient, Doctor, Appointment, Prescription)
-- [ ] CRUD APIs
-- [ ] JWT Authentication
-- [ ] Swagger/OpenAPI docs
-
-### Phase 2: Enhancements
-- [ ] Redis caching (patient profiles)
-- [ ] Role-based permissions
-- [ ] Unit + integration tests
-- [ ] GitHub Actions (CI/CD)
-- [ ] Pre-commit hooks (flake8, black, isort)
-
-### Phase 3: Advanced
-- [ ] Search + filtering
-- [ ] Appointment conflict validation
-- [ ] Notification service (email/SMS mock)
-- [ ] Metrics & monitoring
 
 ---
