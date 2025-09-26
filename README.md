@@ -74,6 +74,7 @@ PHRAPI/
 
 ## 🚀 Getting Started
 
+
 ### 1️⃣ Clone the Repo
 ```bash
 git clone https://github.com/Abey627/patient-health-records-api.git
@@ -84,25 +85,30 @@ cd patient-health-records-api
 ```bash
 pip install -r requirements.txt
 ```
-
 *(Optional but recommended: `python -m pip install --upgrade pip` before this step).*
 
-
-### 3️⃣ Run Development Server
-```bash
-python manage.py runserver
-```
-
-Access at: [http://localhost:8000/](http://localhost:8000/)
-
-### 4️⃣ Create a Django Superuser
+### 3️⃣ Create a Django Superuser
 To access the Django admin interface, create a superuser account:
 ```bash
 python manage.py createsuperuser
 ```
 Follow the prompts to set username, email, and password.
 
-Login at: [http://localhost:8000/admin/](http://localhost:8000/admin/)
+### 4️⃣ Run Development Server
+```bash
+python manage.py runserver
+```
+
+Access at: [http://localhost:8000/](http://localhost:8000/)
+
+Login to admin at: [http://localhost:8000/admin/](http://localhost:8000/admin/)
+
+### 5️⃣ API Documentation (Swagger UI)
+Interactive API docs are available via drf-spectacular:
+```bash
+http://localhost:8000/api/docs/
+```
+This provides a live, auto-generated OpenAPI/Swagger interface for all endpoints.
 
 ---
 
