@@ -76,7 +76,7 @@ PHRAPI/
 
 ### 1️⃣ Clone the Repo
 ```bash
-git clone https://github.com/<your-username>/patient-health-records-api.git
+git clone https://github.com/Abey627/patient-health-records-api.git
 cd patient-health-records-api
 ```
 
@@ -126,20 +126,5 @@ pytest
 - [ ] Appointment conflict validation
 - [ ] Notification service (email/SMS mock)
 - [ ] Metrics & monitoring
-
----
-
-## 🎯 Interview Relevance
-
-This project is designed to highlight:
-
-- **Django REST Framework expertise** (models, serializers, viewsets, permissions).  
-- **Database design** with PostgreSQL.  
-- **Performance optimization** via Redis caching.  
-- **Security** with JWT and role-based access.  
-- **Testing & CI/CD** culture (pytest, GitHub Actions).  
-- **DevOps mindset** (Dockerized environment).  
-
-You can use this project to walk through **design decisions, trade-offs, and engineering practices** in a real-world healthcare scenario.
 
 ---
